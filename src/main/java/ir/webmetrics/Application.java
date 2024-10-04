@@ -32,7 +32,7 @@ public class Application {
         MetricWriter metricWriter = new MetricWriter("/tmp/metrics.json");
         metricWriter.writeMetrics(metrics.values());
 
-        Map<Dimension, List<Long>> recommendation = metricCalculator.recommendation();
+        Map<Dimension, List<Long>> recommendation = metricCalculator.getRecommendations();
         metricWriter = new MetricWriter("/tmp/recommendations.json");
         List<Recommendation> recommendations = recommendation.entrySet()
                 .stream().map(e -> new Recommendation(e.getKey().getApp_id(), e.getKey().getCountry_code(), e.getValue()))

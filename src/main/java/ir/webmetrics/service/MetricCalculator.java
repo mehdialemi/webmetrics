@@ -32,7 +32,7 @@ public class MetricCalculator {
         }
     }
 
-    public Map<Dimension, List<Long>> recommendation() {
+    public Map<Dimension, List<Long>> getRecommendations() {
         Map<Dimension, List<Long>> recommendations = new HashMap<>();
         for (Map.Entry<Dimension, List<Impression>> e : dimensionMap.entrySet()) {
             Map<Long, Metric> metricMap = new HashMap<>();
@@ -60,24 +60,25 @@ public class MetricCalculator {
 
     public Map<Dimension, Metric> getMetrics() {
         Map<Dimension, Metric> metricMap = new HashMap<>();
-        for (Impression impression : impressions) {
-            Dimension dimension = new Dimension(impression.getApp_id(), impression.getCountry_code());
-            Metric metric = metricMap.get(dimension);
-            if (metric == null) {
-                metric = new Metric();
-                metricMap.put(dimension, metric);
-                metric.setApp_id(impression.getApp_id());
-                metric.setCountry_code(impression.getCountry_code());
-                updateMetric(impression, metric);
-                metric.setImpressions(1);
-            } else {
-                updateMetric(impression, metric);
-                metric.setImpressions(metric.getImpressions() + 1);
+        for (Map.Entry<Dimension, List<Impression>> entry : dimensionMap.entrySet()) {
+            Dimension dimension = entry.getKey();
+            for (Impression impression : entry.getValue()) {
+                Metric metric = metricMap.get(dimension);
+                if (metric == null) {
+                    metric = new Metric();
+                    metricMap.put(dimension, metric);
+                    metric.setApp_id(impression.getApp_id());
+                    metric.setCountry_code(impression.getCountry_code());
+                    updateMetric(impression, metric);
+                    metric.setImpressions(1);
+                } else {
+                    updateMetric(impression, metric);
+                    metric.setImpressions(metric.getImpressions() + 1);
+                }
             }
         }
         logger.info("Found {} metrics", metricMap.size());
         return metricMap;
-
     }
 
     private void updateMetric(Impression impression, Metric metric) {
@@ -87,5 +88,4 @@ public class MetricCalculator {
             metric.setRevenue(revCounter.getRevenue());
         }
     }
-
 }
